@@ -97,7 +97,7 @@ class TasksController extends Controller
     {
         $request->validate([
             'status'=>'required|max:10',
-            'content'=>'required,'
+            'content'=>'required'
         ]);
         
         $task=Task::findOrFail($id);
