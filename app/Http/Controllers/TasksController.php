@@ -76,12 +76,16 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
+    {            
         $task=Task::findOrFail($id);
         
-        return view('tasks.show',[
-            'task'=>$task,
-        ]);
+        if(\Auth::id()===$task->user_id){
+            return view('tasks.show',[
+                'task'=>$task,
+            ]);
+        }else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -91,12 +95,16 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
+    { 
         $task=Task::findOrFail($id);
         
-        return view('tasks.edit',[
-            'task'=>$task,
-        ]);
+        if(\Auth::id()===$task->user_id){
+            return view('tasks.edit',[
+                'task'=>$task,
+            ]);
+        }else{
+            return redirect('/');
+        }
     }
 
     /**
@@ -114,10 +122,9 @@ class TasksController extends Controller
         ]);
         
         $task=Task::findOrFail($id);
-        $request->user()->tasks()->create([
-            'status'=>$request->status,
-            'content'=>$request->content,
-        ]);
+        $task->status=$request->status;
+        $task->content=$request->content;
+        $task->save();
         
         return redirect('/');
     }
@@ -130,10 +137,10 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        $task=\App\Task::findOrFail($id);
+        $task=Task::findOrFail($id);
         
         if(\Auth::id()===$task->user_id){
-        $task->delete();
+            $task->delete();
         }
         
         return redirect('/');
