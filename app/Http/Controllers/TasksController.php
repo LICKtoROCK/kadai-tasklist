@@ -15,12 +15,24 @@ class TasksController extends Controller
      */
     public function index()
     {
-        $tasks=Task::all();
+        if(\Auth::check()){
+            
+            $user=\Auth::user();
+            
+            $tasks=$user->tasks()->get();
+            
+            $data=[
+                'user'=>$user,
+                'tasks'=>$tasks,
+            ];
         
-        return view('tasks.index',[
-            'tasks'=>$tasks,
-        ]);
+            return view('tasks.index',$data);
+            
+        }else{
+            return view('welcome');
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -49,10 +61,11 @@ class TasksController extends Controller
             'content'=>'required'
         ]);
         
-        $task=new Task;
-        $task->status=$request->status;
-        $task->content=$request->content;
-        $task->save();
+        $request->user()->tasks()->create([
+            'status'=>$request->status,
+            'content'=>$request->content,
+        ]);
+        
         return redirect('/');
     }
 
@@ -101,9 +114,10 @@ class TasksController extends Controller
         ]);
         
         $task=Task::findOrFail($id);
-        $task->status=$request->status;
-        $task->content=$request->content;
-        $task->save();
+        $request->user()->tasks()->create([
+            'status'=>$request->status,
+            'content'=>$request->content,
+        ]);
         
         return redirect('/');
     }
@@ -116,8 +130,11 @@ class TasksController extends Controller
      */
     public function destroy($id)
     {
-        $task=Task::findOrFail($id);
+        $task=\App\Task::findOrFail($id);
+        
+        if(\Auth::id()===$task->user_id){
         $task->delete();
+        }
         
         return redirect('/');
     }

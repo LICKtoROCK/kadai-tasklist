@@ -29,6 +29,8 @@ class AddUserIdTable extends Migration
     {
         Schema::table('tasks', function (Blueprint $table) {
             $table->dropForeign('tasks_user_id_foreign');
+            
+            $table->dropcalam('user_id');
         });
     }
 }
